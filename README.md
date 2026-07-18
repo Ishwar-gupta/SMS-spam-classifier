@@ -8,7 +8,7 @@ The application is built with **Python**, **Scikit-learn**, **NLTK**, and **Stre
 
 ## 🚀 Live Demo
 
-🔗 **Live Application:** _(Add your Streamlit deployment link here)_
+🔗 **Live Application:** [ishwar-gupta.github.io/SMS-spam-classifier](https://ishwar-gupta.github.io/SMS-spam-classifier/)
 
 Example:
 

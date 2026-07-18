@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Email/SMS Spam Classifier</title>
+    <meta
+      name="description"
+      content="Email/SMS spam classifier project landing page with interactive demo and beautiful UI."
+    />
+    <style>
+      :root {
+        --bg: #050816;
+        --surface: rgba(255, 255, 255, 0.05);
+        --surface-strong: rgba(255, 255, 255, 0.12);
+        --accent: #7c84ff;
+        --accent-soft: #4f56c7;
+        --text: #f7f8ff;
+        --muted: #9aa5d4;
+        --border: rgba(255, 255, 255, 0.12);
+        font-family:
+          Inter,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        scroll-behavior: smooth;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background:
+          radial-gradient(
+            circle at top left,
+            rgba(124, 132, 255, 0.24),
+            transparent 30%
+          ),
+          linear-gradient(180deg, #070b1b 0%, #050816 100%);
+        color: var(--text);
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      button {
+        font: inherit;
+      }
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        backdrop-filter: blur(14px);
+        background: rgba(5, 8, 22, 0.8);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .nav-container {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-size: 0.95rem;
+      }
+      .brand span {
+        color: var(--accent);
+      }
+      nav ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        font-size: 0.95rem;
+      }
+      nav li {
+        position: relative;
+      }
+      nav a:hover::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -0.35rem;
+        width: 100%;
+        height: 2px;
+        background: var(--accent);
+      }
+      .hero {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 5rem 1.5rem 3rem;
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: 1.5rem;
+        align-items: center;
+      }
+      .hero-copy {
+        grid-column: span 7;
+      }
+      .hero-copy h1 {
+        margin: 0;
+        font-size: clamp(2.8rem, 5vw, 4.7rem);
+        line-height: 0.95;
+      }
+      .hero-copy p {
+        max-width: 620px;
+        margin: 1.6rem 0 2rem;
+        color: var(--muted);
+        line-height: 1.8;
+        font-size: 1.03rem;
+      }
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+      .button,
+      .button-alt {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.95rem 1.6rem;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        font-weight: 600;
+        transition:
+          transform 0.25s ease,
+          background-color 0.25s ease,
+          border-color 0.25s ease;
+      }
+      .button {
+        background: linear-gradient(135deg, var(--accent), #4c7dff);
+        color: white;
+        box-shadow: 0 20px 50px rgba(79, 86, 199, 0.18);
+      }
+      .button:hover {
+        transform: translateY(-2px);
+      }
+      .button-alt {
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.12);
+      }
+      .button-alt:hover {
+        background: rgba(255, 255, 255, 0.12);
+      }
+      .hero-image {
+        grid-column: span 5;
+        border-radius: 32px;
+        overflow: hidden;
+        min-height: 420px;
+        background: linear-gradient(
+          135deg,
+          rgba(124, 132, 255, 0.14),
+          rgba(9, 14, 34, 0.95)
+        );
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 2rem;
+        display: grid;
+        place-items: center;
+      }
+      .hero-card {
+        width: 100%;
+        max-width: 420px;
+        padding: 2rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 28px;
+        box-shadow: 0 30px 70px rgba(4, 9, 25, 0.28);
+      }
+      .hero-card h2 {
+        margin-top: 0;
+        font-size: 1.35rem;
+      }
+      .hero-card p {
+        margin: 0.85rem 0 1.4rem;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+      .hero-card label {
+        display: block;
+        margin-bottom: 0.65rem;
+        font-size: 0.92rem;
+        color: var(--muted);
+      }
+      .hero-card textarea {
+        width: 100%;
+        min-height: 118px;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        padding: 1rem 1.1rem;
+        resize: vertical;
+        font-size: 0.98rem;
+        outline: none;
+      }
+      .hero-card textarea:focus {
+        border-color: rgba(124, 132, 255, 0.4);
+        box-shadow: 0 0 0 4px rgba(124, 132, 255, 0.12);
+      }
+      .hero-card .result {
+        margin: 1.25rem 0 0;
+        padding: 1rem 1.2rem;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        font-weight: 600;
+      }
+      .hero-card .result.spam {
+        color: #ff7b7b;
+      }
+      .hero-card .result.ham {
+        color: #7bffd6;
+      }
+      .hero-card .demo-button {
+        width: 100%;
+        margin-top: 1rem;
+      }
+      .section {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 4rem 1.5rem;
+      }
+      .section-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+      .section-title h2 {
+        margin: 0;
+        font-size: clamp(2rem, 2.4vw, 2.7rem);
+      }
+      .section-title p {
+        margin: 0;
+        color: var(--muted);
+        max-width: 680px;
+      }
+      .grid {
+        display: grid;
+        gap: 1.5rem;
+      }
+      .feature-card,
+      .panel {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 24px;
+        padding: 1.8rem;
+        position: relative;
+        overflow: hidden;
+      }
+      .feature-card h3 {
+        margin-top: 0;
+        margin-bottom: 0.75rem;
+      }
+      .feature-card p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.75;
+      }
+      .panel h3 {
+        margin-top: 0;
+        margin-bottom: 0.9rem;
+      }
+      .panel li {
+        margin-bottom: 0.75rem;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+      .panel li strong {
+        color: var(--text);
+      }
+      .hero-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .feature-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .footer {
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 2rem 1.5rem 3rem;
+        margin-top: 3rem;
+      }
+      .footer-content {
+        max-width: 1180px;
+        margin: 0 auto;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 1.5rem;
+        color: var(--muted);
+      }
+      .footer-content p {
+        margin: 0;
+      }
+      .footer-links a {
+        color: var(--muted);
+        margin-right: 1.5rem;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.45rem 0.85rem;
+        border-radius: 999px;
+        background: rgba(124, 132, 255, 0.16);
+        border: 1px solid rgba(124, 132, 255, 0.22);
+        color: #dfe2ff;
+        font-size: 0.85rem;
+      }
+      @media (max-width: 980px) {
+        .hero {
+          grid-template-columns: 1fr;
+        }
+        .hero-copy,
+        .hero-image {
+          grid-column: span 12;
+        }
+        .feature-grid,
+        .hero-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 680px) {
+        .nav-container {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        nav ul {
+          flex-wrap: wrap;
+          gap: 0.8rem;
+        }
+        .hero {
+          padding-top: 3rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="nav-container">
+        <a href="#home" class="brand"><span>Spam</span>Guard</a>
+        <nav>
+          <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#demo">Demo</a></li>
+            <li><a href="#about">About</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" id="home">
+        <div class="hero-copy">
+          <span class="badge">Email & SMS Spam Classifier</span>
+          <h1>Detect spam instantly with smart message analysis.</h1>
+          <p>
+            Explore a modern interface for the spam classification project.
+            Discover how NLP, TF-IDF, and Naive Bayes work together to identify
+            spam messages quickly and accurately.
+          </p>
+          <div class="hero-actions">
+            <a href="#demo" class="button">Try Demo</a>
+            <a href="README.md" class="button-alt">View Project</a>
+          </div>
+        </div>
+
+        <div class="hero-image">
+          <div class="hero-card">
+            <h2>Live UI Demo</h2>
+            <p>
+              Enter any message to preview a quick client-side classification.
+            </p>
+            <label for="message-input">Your message</label>
+            <textarea
+              id="message-input"
+              placeholder="Type a sample email or SMS here..."
+            ></textarea>
+            <button class="button demo-button" id="predict-button">
+              Check Spam
+            </button>
+            <div class="result" id="prediction-result">
+              Prediction will appear here.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="features">
+        <div class="section-title">
+          <div>
+            <h2>Built for clarity and modern design</h2>
+            <p>
+              A polished one-page web landing experience that explains the
+              project, shows key features, and highlights the spam detection
+              workflow.
+            </p>
+          </div>
+        </div>
+        <div class="grid feature-grid">
+          <div class="feature-card">
+            <h3>Beautiful user interface</h3>
+            <p>
+              Clean typography, glassmorphism cards, and a responsive layout
+              designed to look great on desktop and mobile.
+            </p>
+          </div>
+          <div class="feature-card">
+            <h3>Interactive demo</h3>
+            <p>
+              Try the example text input to get an instant spam or not spam
+              result directly in the browser.
+            </p>
+          </div>
+          <div class="feature-card">
+            <h3>Ready for GitHub Pages</h3>
+            <p>
+              This single HTML file includes internal CSS and JavaScript so it
+              can be hosted directly on GitHub Pages.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="about">
+        <div class="section-title">
+          <div>
+            <h2>How the spam classifier works</h2>
+            <p>
+              The project is powered by NLP preprocessing, TF-IDF vectorization,
+              and a Naive Bayes classifier trained on SMS and email data.
+            </p>
+          </div>
+        </div>
+        <div class="grid hero-grid">
+          <div class="panel">
+            <h3>Preprocessing</h3>
+            <ul>
+              <li><strong>Lowercase text</strong> to standardize input.</li>
+              <li><strong>Remove punctuation</strong> and tokenize words.</li>
+              <li>
+                <strong>Remove stopwords</strong> to focus on meaningful terms.
+              </li>
+              <li><strong>Apply stemming</strong> to unify similar words.</li>
+            </ul>
+          </div>
+          <div class="panel">
+            <h3>Vectorization</h3>
+            <ul>
+              <li>
+                <strong>TF-IDF Vectorizer</strong> converts text to numerical
+                features.
+              </li>
+              <li>
+                <strong>Top terms</strong> are selected to improve prediction
+                speed.
+              </li>
+              <li>Each message becomes a feature vector for the classifier.</li>
+            </ul>
+          </div>
+          <div class="panel">
+            <h3>Prediction</h3>
+            <ul>
+              <li>
+                <strong>Multinomial Naive Bayes</strong> predicts spam or ham.
+              </li>
+              <li>Fast, lightweight, and reliable for text classification.</li>
+              <li>Ideal for deployment as a web interface or app.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-content">
+        <div>
+          <p>Built with Python, NLP, and machine learning.</p>
+          <p>
+            Host this page on GitHub Pages by adding it to your repository root.
+          </p>
+        </div>
+        <div class="footer-links">
+          <a href="#home">Home</a>
+          <a href="#features">Features</a>
+          <a href="#about">About</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const keywords = [
+        "free",
+        "win",
+        "won",
+        "prize",
+        "urgent",
+        "claim",
+        "offer",
+        "congratulations",
+        "credit",
+        "loan",
+        "buy",
+        "click",
+        "subscribe",
+        "cash",
+        "money",
+        "gift",
+        "password",
+        "limited",
+        "sale",
+      ];
+
+      const button = document.getElementById("predict-button");
+      const input = document.getElementById("message-input");
+      const result = document.getElementById("prediction-result");
+
+      button.addEventListener("click", () => {
+        const text = input.value.trim();
+        if (!text) {
+          result.textContent = "Please enter a message to classify.";
+          result.className = "result";
+          return;
+        }
+
+        const lower = text.toLowerCase();
+        let score = 0;
+        keywords.forEach((keyword) => {
+          if (lower.includes(keyword)) score += 1;
+        });
+
+        const spamPhrases = [
+          "click here",
+          "act now",
+          "limited time",
+          "free trial",
+          "risk free",
+          "no cost",
+          "earn money",
+        ];
+        spamPhrases.forEach((phrase) => {
+          if (lower.includes(phrase)) score += 2;
+        });
+
+        const isSpam = score >= 2;
+        result.textContent = isSpam
+          ? "Prediction: Spam detected"
+          : "Prediction: Not spam";
+        result.className = isSpam ? "result spam" : "result ham";
+      });
+    </script>
+  </body>
+</html>

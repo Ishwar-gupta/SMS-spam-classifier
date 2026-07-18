@@ -13,7 +13,7 @@ The application is built with **Python**, **Scikit-learn**, **NLTK**, and **Stre
 Example:
 
 ```
-https://your-app-name.streamlit.app
+https://email-sms-spam-classifiers.streamlit.app/
 ```
 
 ---
